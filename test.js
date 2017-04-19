@@ -1,32 +1,25 @@
 #!/usr/bin/env node
 
-
-var SDL = require('./src/SDL.js');
-var SDL_events = require('./src/SDL_events.js');
-var SDL_image  = require('./src/SDL_image.js');
-var SDL_rect   = require('./src/SDL_rect.js');
-var SDL_render = require('./src/SDL_render.js');
-var SDL_video  = require('./src/SDL_video.js');
+const SDL = require('sdl');
 
 
+// const SDL_events = require('./src/SDL_events.js');
+// const SDL_image  = require('./src/SDL_image.js');
+// const SDL_rect   = require('./src/SDL_rect.js');
+// const SDL_render = require('./src/SDL_render.js');
+// const SDL_video  = require('./src/SDL_video.js');
 
-SDL.SDL_Init(SDL.SDL_INIT_EVERYTHING);
 
 
-var window   = SDL_video.SDL_CreateWindow('Hello World', 100, 100, 640, 480, SDL_video.SDL_WindowFlags.SDL_WINDOW_SHOWN | SDL_video.SDL_WindowFlags.SDL_WINDOW_RESIZABLE);
-var renderer = SDL_render.SDL_CreateRenderer(window, -1, SDL_render.RENDERER_ACCELERATED);
+SDL.init(SDL.INIT.everything);
 
-var surface  = SDL_image.IMG_Load(__dirname + '/test.png');
-var texture  = SDL_render.SDL_CreateTextureFromSurface(renderer, surface);
 
-var src = new SDL_rect.SDL_Rect({
-	x: 10,
-	y: 10,
-	w: 32,
-	h: 32
-});
+let window   = SDL.createWindow('Hello World', 100, 100, 640, 480, SDL.WINDOW.shown | SDL.WINDOW.resizable);
+let renderer = SDL.createRenderer(window, -1, SDL.RENDERER.accelerated);
+let surface  = SDL.loadImage(__dirname + '/test.png');
+let texture  = SDL.createTextureFromSurface(renderer, surface);
 
-var dst = new SDL_rect.SDL_Rect({
+let dst = new SDL.Rect({
 	x: 32,
 	y: 32,
 	w: 128,
@@ -35,27 +28,21 @@ var dst = new SDL_rect.SDL_Rect({
 
 
 if (window.isNull() || renderer.isNull()) {
-
 	console.log('SHIT, window or renderer is null');
-
-} else {
-
-
-
 }
 
 
 
-var fx = 1;
-var fy = 1;
-var r  = 64;
-var g  = 64;
-var b  = 80;
-var a  = 255;
-var randomize = false;
+let fx = 1;
+let fy = 1;
+let r  = 64;
+let g  = 64;
+let b  = 80;
+let a  = 255;
+let randomize = false;
 
 
-var main = setInterval(function() {
+setInterval(function() {
 
 	if (randomize === true) {
 
@@ -75,40 +62,39 @@ var main = setInterval(function() {
 	dst.y = dst.y + fy * 5;
 
 
-	SDL_render.SDL_SetRenderDrawColor(renderer, r, g, b, a);
+	SDL.setRenderDrawColor(renderer, r, g, b, a);
+
+
+	SDL.renderClear(renderer);
+	SDL.renderCopy(renderer, texture, null, dst.ref());
+	SDL.renderPresent(renderer);
 
 
 
-	SDL_render.SDL_RenderClear(renderer);
+	// let event  = new SDL_events.SDL_Event;
+	// let quit   = false;
+	// let result = SDL_events.SDL_PollEvent(event.ref());
+	// if (result) {
 
-	SDL_render.SDL_RenderCopy(renderer, texture, null, dst.ref());
+	// 	if (event.type === SDL_events.SDL_EventType.SDL_QUIT) {
 
-	SDL_render.SDL_RenderPresent(renderer);
+	// 		quit = true;
 
+	// 	} else if (event.type === SDL_events.SDL_EventType.SDL_MOUSEMOTION) {
 
+	// 		randomize = !randomize;
 
-	var event  = new SDL_events.SDL_Event;
-	var quit   = false;
-	var result = SDL_events.SDL_PollEvent(event.ref());
+	// 		console.log(event.motion.x, event.motion.y);
 
-	if (result) {
-
-		if (event.type === SDL_events.SDL_EventType.SDL_QUIT) {
-			quit = true;
-		} else if (event.type === SDL_events.SDL_EventType.SDL_MOUSEMOTION) {
-			randomize = !randomize;
-
-console.log(event.motion.x, event.motion.y);
-
-		}
+	// 	}
 
 
 
-		if (quit === true) {
-			clearInterval(main);
-		}
+	// 	if (quit === true) {
+	// 		clearInterval(main);
+	// 	}
 
-	}
+	// }
 
 }, 1000 / 60);
 
