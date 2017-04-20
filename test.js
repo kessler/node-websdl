@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-const SDL = require('sdl');
+// const SDL = require('sdl');
+const SDL = require('./src/SDL.js');
 
 
 // const SDL_events = require('./src/SDL_events.js');

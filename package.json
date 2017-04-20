@@ -4,13 +4,10 @@
   "description": "SDL2 Runtime (using latest and up-to-date FFI bindings)",
   "main": "src/main.js",
   "dependencies": {
-    "iconv": "*",
-    "ffi": "*",
-    "ref": "*",
-    "ref-array": "*",
-    "ref-struct": "*",
-    "ref-union": "*",
-    "ref-wchar": "*"
+    "ffi": "^2.2.0",
+    "ref": "^1.3.4",
+    "ref-array": "^1.2.0",
+    "ref-struct": "^1.1.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
