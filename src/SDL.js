@@ -102,11 +102,11 @@ const SDL               = _ffi.Library(__dirname + '/lib/' + process.platform + 
 	SDL_HideWindow:        [ _void_type,      [ _window_pointer ] ],
 	SDL_MaximizeWindow:    [ _void_type,      [ _window_pointer ] ],
 	SDL_MinimizeWindow:    [ _void_type,      [ _window_pointer ] ],
-	SDL_DestroyWindow:     [ _void_type,      [ _window_pointer ] ],
 	SDL_SetWindowPosition: [ _void_type,      [ _window_pointer, _int, _int ] ],
 	SDL_GetWindowPosition: [ _void_type,      [ _window_pointer, _int_pointer, _int_pointer ] ],
 	SDL_SetWindowSize:     [ _void_type,      [ _window_pointer, _int, _int ] ],
 	SDL_GetWindowSize:     [ _void_type,      [ _window_pointer, _int_pointer, _int_pointer ] ],
+	SDL_DestroyWindow:     [ _void_type,      [ _window_pointer ] ],
 
 	SDL_CreateRenderer:           [ _renderer_pointer, [ _window_pointer, _int, _uint32 ] ],
 	SDL_CreateTexture:            [ _texture_pointer,  [ _renderer_pointer, _uint32, _int, _int, _int ] ],
@@ -209,25 +209,9 @@ module.exports = {
 	init: SDL.SDL_Init,
 	quit: SDL.SDL_Quit,
 
-	createWindow:      SDL.SDL_CreateWindow,
-	showWindow:        SDL.SDL_ShowWindow,
-	hideWindow:        SDL.SDL_HideWindow,
-	maximizeWindow:    SDL.SDL_MaximizeWindow,
-	minimizeWindow:    SDL.SDL_MinimizeWindow,
-	destroyWindow:     SDL.SDL_DestroyWindow,
-	setWindowPosition: SDL.SDL_SetWindowPosition,
-	getWindowPosition: SDL.SDL_GetWindowPosition,
-	setWindowSize:     SDL.SDL_SetWindowSize,
-	getWindowSize:     SDL.SDL_GetWindowSize,
-
-	createRenderer:           SDL.SDL_CreateRenderer,
-	createTexture:            SDL.SDL_CreateTexture,
-	createTextureFromSurface: SDL.SDL_CreateTextureFromSurface,
-	setRenderDrawColor:       SDL.SDL_SetRenderDrawColor,
 	getRenderDrawColor:       SDL.SDL_GetRenderDrawColor,
 	setRenderDrawBlendMode:   SDL.SDL_SetRenderDrawBlendMode,
 	getRenderDrawBlendMode:   SDL.SDL_GetRenderDrawBlendMode,
-	renderClear:              SDL.SDL_RenderClear,
 	renderDrawPoint:          SDL.SDL_RenderDrawPoint,
 	renderDrawPoints:         SDL.SDL_RenderDrawPoints,
 	renderDrawLine:           SDL.SDL_RenderDrawLine,
@@ -236,12 +220,8 @@ module.exports = {
 	renderDrawRects:          SDL.SDL_RenderDrawRects,
 	renderFillRect:           SDL.SDL_RenderFillRect,
 	renderFillRects:          SDL.SDL_RenderFillRects,
-	renderCopy:               SDL.SDL_RenderCopy,
 	renderCopyEx:             SDL.SDL_RenderCopyEx,
 	renderReadPixels:         SDL.SDL_RenderReadPixels,
-	renderPresent:            SDL.SDL_RenderPresent,
-	destroyTexture:           SDL.SDL_DestroyTexture,
-	destroyRenderer:          SDL.SDL_DestroyRenderer,
 
 
 
@@ -249,7 +229,196 @@ module.exports = {
 	 * CUSTOM API
 	 */
 
-	loadImage: SDL_image.IMG_Load
+	createRenderer: function(window, index, flags) {
+
+		let renderer = SDL.SDL_CreateRenderer(window._ref, index, flags);
+
+
+		return {
+
+			_ref:    renderer,
+
+			clear: function() {
+
+				if (renderer !== null) {
+					SDL.SDL_RenderClear(renderer);
+				}
+
+			},
+
+			copy: function(texture, source, dest) {
+
+				if (renderer !== null) {
+
+					SDL.SDL_RenderCopy(
+						renderer,
+						texture._ref,
+						source !== null ? source.ref() : null,
+						dest !== null ? dest.ref() : null
+					);
+
+				}
+
+			},
+
+			destroy: function() {
+
+				if (renderer !== null) {
+					SDL.SDL_DestroyRenderer(renderer);
+					this._ref = null;
+					renderer  = null;
+				}
+
+			},
+
+			present: function() {
+
+				if (renderer !== null) {
+					SDL.SDL_RenderPresent(renderer);
+				}
+
+			},
+
+			setDrawColor: function(r, g, b, a) {
+
+				if (renderer !== null) {
+					SDL.SDL_SetRenderDrawColor(renderer, r, g, b, a);
+				}
+
+			}
+
+		};
+
+	},
+
+	createTexture: function(renderer, path) {
+
+		let surface = SDL_image.IMG_Load(path);
+		let texture = SDL.SDL_CreateTextureFromSurface(renderer._ref, surface);
+
+
+		return {
+
+			_ref: texture,
+
+			destroy: function() {
+
+				if (texture !== null) {
+					SDL.SDL_DestroyTexture(texture);
+					texture = null;
+					surface = null;
+				}
+
+			}
+
+		};
+
+	},
+
+	createWindow: function(title, x, y, w, h, flags) {
+
+		let window = SDL.SDL_CreateWindow(title, x, y, w, h, flags);
+
+
+		return {
+
+			_ref:     window,
+
+			minimize: _ => window !== null && SDL.SDL_MinimizeWindow(window),
+			maximize: _ => window !== null && SDL.SDL_MaximizeWindow(window),
+			show:     _ => window !== null && SDL.SDL_ShowWindow(window),
+			hide:     _ => window !== null && SDL.SDL_HideWindow(window),
+
+			destroy: function() {
+
+				if (window !== null) {
+					SDL.SDL_DestroyWindow(window);
+					this._ref = null;
+					window    = null;
+				}
+
+			},
+
+			setPosition: function(position) {
+
+				if (window !== null) {
+
+					SDL.SDL_SetWindowPosition(
+						window,
+						position.x,
+						position.y
+					);
+
+					return true;
+
+				}
+
+				return false;
+
+			},
+
+			getPosition: function() {
+
+				if (window !== null) {
+
+					let x = _ref.alloc('int');
+					let y = _ref.alloc('int');
+
+					SDL.SDL_GetWindowPosition(window, x, y);
+
+					return {
+						x:  x.deref(),
+						y: y.deref()
+					};
+
+				}
+
+				return null;
+
+			},
+
+			setSize: function(dimensions) {
+
+				if (window !== null) {
+
+					SDL.SDL_SetWindowSize(
+						window,
+						dimensions.width,
+						dimensions.height
+					);
+
+					return true;
+
+				}
+
+				return false;
+
+			},
+
+			getSize: function() {
+
+				if (window !== null) {
+
+					let width  = _ref.alloc('int');
+					let height = _ref.alloc('int');
+
+					SDL.SDL_GetWindowSize(window, width, height);
+
+					return {
+						width:  width.deref(),
+						height: height.deref()
+					};
+
+				}
+
+
+				return null;
+
+			}
+
+		};
+
+	}
 
 };
 
