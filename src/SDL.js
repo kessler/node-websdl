@@ -228,6 +228,10 @@ module.exports = {
 	/*
 	 * CUSTOM API
 	 */
+	
+	createColor: function(r, g, b, a) {
+		return new SDL_Color(r, g, b, a)
+	},
 
 	createRenderer: function(window, index, flags) {
 
@@ -294,8 +298,14 @@ module.exports = {
 	createTexture: function(renderer, path) {
 
 		let surface = SDL_image.IMG_Load(path);
-		let texture = SDL.SDL_CreateTextureFromSurface(renderer._ref, surface);
+		
+		return module.exports.createTextureFromSurface(renderer, surface)
 
+	},
+
+	createTextureFromSurface: function(renderer, surface) {
+
+		let texture = SDL.SDL_CreateTextureFromSurface(renderer._ref, surface);
 
 		return {
 
@@ -308,11 +318,8 @@ module.exports = {
 					texture = null;
 					surface = null;
 				}
-
 			}
-
 		};
-
 	},
 
 	createWindow: function(title, x, y, w, h, flags) {
