@@ -11,6 +11,7 @@ const _int_pointer   = _ref.refType(_int);
 const _uint8         = _ref.types.uint8;
 const _uint8_pointer = _ref.refType(_uint8);
 const _uint32        = _ref.types.uint32;
+const _uint32_pointer = _ref.refType(_uint32);
 const _string        = _ref.types.CString;
 
 
@@ -96,6 +97,7 @@ const _window_pointer   = _ref.refType(_void_type);
 const SDL               = _ffi.Library(__dirname + '/lib/' + process.platform + '/' + process.arch + '/libSDL2-2.0' + _ffi.LIB_EXT, {
 	SDL_Init:              [ _int,            [ _uint32 ] ],
 	SDL_Quit:              [ _void_type,      [] ],
+	SDL_GetError: 		[_string, []],
 
 	SDL_CreateWindow:      [ _window_pointer, [ _string, _int, _int, _int, _int, _uint32 ] ],
 	SDL_ShowWindow:        [ _void_type,      [ _window_pointer ] ],
@@ -111,6 +113,7 @@ const SDL               = _ffi.Library(__dirname + '/lib/' + process.platform + 
 	SDL_CreateRenderer:           [ _renderer_pointer, [ _window_pointer, _int, _uint32 ] ],
 	SDL_CreateTexture:            [ _texture_pointer,  [ _renderer_pointer, _uint32, _int, _int, _int ] ],
 	SDL_CreateTextureFromSurface: [ _texture_pointer,  [ _renderer_pointer, _SDL_Surface_pointer ] ],
+	SDL_QueryTexture: 		[ _int, [_texture_pointer, _uint32_pointer, _int_pointer, _int_pointer, _int_pointer]],
 	SDL_SetRenderDrawColor:       [ _int, [ _renderer_pointer, _uint8, _uint8, _uint8, _uint8 ] ],
 	SDL_GetRenderDrawColor:       [ _int, [ _renderer_pointer, _uint8_pointer, _uint8_pointer, _uint8_pointer, _uint8_pointer ] ],
 	SDL_SetRenderDrawBlendMode:   [ _int, [ _renderer_pointer, _int ] ],
@@ -130,7 +133,6 @@ const SDL               = _ffi.Library(__dirname + '/lib/' + process.platform + 
 	SDL_RenderPresent:            [ _void_type, [ _renderer_pointer ] ],
 	SDL_DestroyTexture:           [ _void_type, [ _texture_pointer  ] ],
 	SDL_DestroyRenderer:          [ _void_type, [ _renderer_pointer ] ]
-
 });
 
 const SDL_image = _ffi.Library(__dirname + '/lib/' + process.platform + '/' + process.arch + '/libSDL2_image-2.0' + _ffi.LIB_EXT, {
@@ -208,6 +210,7 @@ module.exports = {
 
 	init: SDL.SDL_Init,
 	quit: SDL.SDL_Quit,
+	getError: SDL.SDL_GetError,
 
 	getRenderDrawColor:       SDL.SDL_GetRenderDrawColor,
 	setRenderDrawBlendMode:   SDL.SDL_SetRenderDrawBlendMode,
@@ -222,7 +225,6 @@ module.exports = {
 	renderFillRects:          SDL.SDL_RenderFillRects,
 	renderCopyEx:             SDL.SDL_RenderCopyEx,
 	renderReadPixels:         SDL.SDL_RenderReadPixels,
-
 
 
 	/*
@@ -320,6 +322,27 @@ module.exports = {
 				}
 			}
 		};
+	},
+
+	queryTexture: function(texture, format = null, access = null) {
+		let outW = _ref.alloc(_int);
+		let outH = _ref.alloc(_int);
+		let formatPtr = _ref.alloc(_uint32, format);
+		let accessPtr = _ref.alloc(_int, access);
+
+		// let formatPtr = _ref.refType(format);
+		// let accessPtr = _ref.refType(access);
+		let success = SDL.SDL_QueryTexture(texture._ref, formatPtr, accessPtr, outW, outH);
+
+		if (success !== 0) {
+			let error = SDL.SDL_GetError();
+			throw new Error('failed to query texture: ' + error);
+		}
+
+		return {
+			w: outW.deref(),
+			h: outH.deref()
+		}
 	},
 
 	createWindow: function(title, x, y, w, h, flags) {

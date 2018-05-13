@@ -17,15 +17,20 @@ let dest = new SDL.Rect({
 });
 
 let success = TTF_Font.TTF_Init()
-console.log(success)
-let font = TTF_Font.TTF_OpenFont('/Library/Fonts/Verdana.ttf', 16)
-let textSurface = TTF_Font.TTF_RenderUTF8_Solid(font, 'test 123', SDL.createColor(255, 255, 255, 255))
+if (success !== 0) {
+	throw new Error('failed to init TTF_Font')
+}
+
+let font = TTF_Font.TTF_OpenFont('/Library/Fonts/Arial.ttf', 22)
+let textSurface = TTF_Font.TTF_RenderUTF8_Blended(font, 'test 123', SDL.createColor(255, 255, 255, 255))
 let textTexture = SDL.createTextureFromSurface(renderer, textSurface)
+let result = SDL.queryTexture(textTexture)
+
 let textDest = new SDL.Rect({
-	x: 0,
-	y: 0,
-	w: 150,
-	h: 150
+	x: 20,
+	y: 10,
+	w: result.w,
+	h: result.h
 });
 
 let fx = 1;

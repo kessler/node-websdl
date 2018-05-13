@@ -104,7 +104,8 @@ var library = path.join(__dirname, 'lib', process.platform, process.arch, 'libSD
 var SDL_ttf = ffi.Library(library, {
 	TTF_Init: [int,[]],
 	TTF_OpenFont: [TTF_Font_pointer, [string, size_t]],
-	TTF_RenderUTF8_Solid: [SDL_Surface_pointer, [TTF_Font_pointer, string, SDL_Color]]
+	TTF_RenderUTF8_Solid: [SDL_Surface_pointer, [TTF_Font_pointer, string, SDL_Color]],
+	TTF_RenderUTF8_Blended: [SDL_Surface_pointer, [TTF_Font_pointer, string, SDL_Color]]
 });
 
 module.exports = SDL_ttf;
