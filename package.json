@@ -2,7 +2,7 @@
   "name": "node-sdl-runtime",
   "version": "0.0.1",
   "description": "SDL2 Runtime (using latest and up-to-date FFI bindings)",
-  "main": "src/main.js",
+  "main": "src/SDL.js",
   "dependencies": {
     "ffi": "^2.3.0",
     "ref": "^1.3.4",
