@@ -5,7 +5,6 @@ const SDL = require('../src/SDL.js');
 const TTF_Font = require('../src/SDL_ttf.js')
 SDL.init(SDL.INIT.everything);
 
-
 let window = SDL.createWindow('Basic Test', 100, 100, 640, 480, SDL.WINDOW.shown | SDL.WINDOW.resizable);
 let renderer = SDL.createRenderer(window, -1, SDL.RENDERER.accelerated);
 let texture = SDL.createTexture(renderer, __dirname + '/image.png');
@@ -22,7 +21,7 @@ if (success !== 0) {
 }
 
 let font = TTF_Font.TTF_OpenFont('/Library/Fonts/Arial.ttf', 22)
-let textSurface = TTF_Font.TTF_RenderUTF8_Blended(font, 'test 123', SDL.createColor(255, 255, 255, 255))
+let textSurface = TTF_Font.TTF_RenderUTF8_Blended(font, 'test 123', SDL.createColor(255, 255, 255))
 let textTexture = SDL.createTextureFromSurface(renderer, textSurface)
 let result = SDL.queryTexture(textTexture)
 

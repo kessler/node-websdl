@@ -194,9 +194,6 @@ SDL.WINDOW = {
 	allow_highdpi:      0x00002000
 };
 
-
-
-
 module.exports = {
 
 	INIT:      SDL.INIT,

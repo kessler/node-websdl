@@ -4,7 +4,7 @@
   "description": "SDL2 Runtime (using latest and up-to-date FFI bindings)",
   "main": "src/main.js",
   "dependencies": {
-    "ffi": "^2.2.0",
+    "ffi": "^2.3.0",
     "ref": "^1.3.4",
     "ref-array": "^1.2.0",
     "ref-struct": "^1.1.0",
